@@ -34,5 +34,6 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "typings": "./lib/index.d.ts"
 }
