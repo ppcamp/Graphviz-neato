@@ -105,60 +105,60 @@ export class Neato {
     if (existsSync(this._dotfilename)) unlinkSync(this._dotfilename);
 
     // Store these infos in the file
-    try {
-      const stream = createWriteStream(this._dotfilename, { flags: 'a', encoding: 'utf8' });
+    // try {
+    const stream = createWriteStream(this._dotfilename, { flags: 'a', encoding: 'utf8' });
 
-      // An auxiliar function
-      const wrln = (str: string) => stream.write(str + '\n');
+    // An auxiliar function
+    const wrln = (str: string) => stream.write(str + '\n');
 
-      // Write header
-      wrln('/* Simple script to generate a graph plot');
-      wrln(' *');
-      wrln(' * to compile:');
-      wrln(` * >> dot -K${this.renderer} -T${this.type} example.dot -o example.svg`);
-      wrln(' */\n');
-      wrln(`/* ${this.comment} */\n`);
+    // Write header
+    wrln('/* Simple script to generate a graph plot');
+    wrln(' *');
+    wrln(' * to compile:');
+    wrln(` * >> dot -K${this.renderer} -T${this.type} example.dot -o example.svg`);
+    wrln(' */\n');
+    wrln(`/* ${this.comment} */\n`);
 
-      // Write graph attr
-      wrln('digraph G {');
-      wrln(`\t/* Graph attributes */`);
-      wrln(`\trankdir=${this.graphAttributes.rankdir};`);
-      wrln(`\toverlap=${this.graphAttributes.overlap};`);
-      wrln(`\tsplines=${this.graphAttributes.splines};`);
-      wrln(`\tsep=${this.graphAttributes.sep};`);
-      wrln(`\tpad=${this.graphAttributes.pad};`);
-      wrln(`\tnodesep=${this.graphAttributes.nodesep};`);
-      wrln(`\tranksep=${this.graphAttributes.ranksep};`);
+    // Write graph attr
+    wrln('digraph G {');
+    wrln(`\t/* Graph attributes */`);
+    wrln(`\trankdir=${this.graphAttributes.rankdir};`);
+    wrln(`\toverlap=${this.graphAttributes.overlap};`);
+    wrln(`\tsplines=${this.graphAttributes.splines};`);
+    wrln(`\tsep=${this.graphAttributes.sep};`);
+    wrln(`\tpad=${this.graphAttributes.pad};`);
+    wrln(`\tnodesep=${this.graphAttributes.nodesep};`);
+    wrln(`\tranksep=${this.graphAttributes.ranksep};`);
 
-      // Write node general attr attr
-      wrln('');
-      wrln(`\t/* NODE general attr */`);
-      wrln(
-        `\tnode [shape=${this.nodeAttributes.shape}, style=${this.nodeAttributes.style}, height=${this.nodeAttributes.height}, width=${this.nodeAttributes.width}, fontsize=${this.nodeAttributes.fontsize}, fontname=${this.nodeAttributes.fontname}, fontcolor=${this.nodeAttributes.fontcolor}, color=${this.nodeAttributes.color} ];\n`,
-      );
+    // Write node general attr attr
+    wrln('');
+    wrln(`\t/* NODE general attr */`);
+    wrln(
+      `\tnode [shape=${this.nodeAttributes.shape}, style=${this.nodeAttributes.style}, height=${this.nodeAttributes.height}, width=${this.nodeAttributes.width}, fontsize=${this.nodeAttributes.fontsize}, fontname=${this.nodeAttributes.fontname}, fontcolor=${this.nodeAttributes.fontcolor}, color=${this.nodeAttributes.color} ];\n`,
+    );
 
-      // Write node particular attr (colors and positions)
-      wrln(`\t/* NODE particular attr */`);
-      this._nodes.forEach((val) => {
-        wrln(`\t${val}`);
-      });
+    // Write node particular attr (colors and positions)
+    wrln(`\t/* NODE particular attr */`);
+    this._nodes.forEach((val) => {
+      wrln(`\t${val}`);
+    });
 
-      // Write edge configs
-      wrln(`\n\t/* Edges (Connections) */`);
-      wrln(
-        `\tedge [ color="${this.graphAttributes.edgecolor}", arrowhead=${this.graphAttributes.arrowhead}, arrowtail=${this.graphAttributes.arrowtail}];`,
-      );
-      this._edges.forEach((val) => wrln(`\t${val}`));
+    // Write edge configs
+    wrln(`\n\t/* Edges (Connections) */`);
+    wrln(
+      `\tedge [ color="${this.graphAttributes.edgecolor}", arrowhead=${this.graphAttributes.arrowhead}, arrowtail=${this.graphAttributes.arrowtail}];`,
+    );
+    this._edges.forEach((val) => wrln(`\t${val}`));
 
-      // Finish
-      wrln('}');
+    // Finish
+    wrln('}');
 
-      // stream.end();
-      stream.end();
-    } catch (err) {
-      // tslint:disable-next-line: no-console
-      console.log(`Some error occurred. Check: ${err}`);
-    }
+    // stream.end();
+    stream.end();
+    // } catch (err) {
+    // tslint:disable-next-line: no-console
+    // console.log(`Some error occurred. Check: ${err}`);
+    // }
   }
 
   /**
@@ -174,7 +174,7 @@ export class Neato {
     const command: string = `dot -K${this.renderer} -T${this.type} ${this._dotfilename} -o ${this.output}.${this.type}`;
     const execOut: ChildProcess = RUN(command);
     // tslint:disable-next-line: no-console
-    console.debug('Neato -> command', command);
+    // console.debug('Neato -> command', command);
     return this._dotfilename;
   }
 }
