@@ -67,7 +67,7 @@ export class Neato {
    * @param fontColor OPTIONAL <string> Color in hex(#33FF33)
    * @param bgColor OPTIONAL <string> Color in hex(#ff44ff)
    */
-  public addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): void {
+  public async addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): Promise<void> {
     if (!node || !label || !pos)
       throw new Error(`You didn't defin'ed the essential variables to this library. Check out the example in git.`);
 
@@ -85,7 +85,7 @@ export class Neato {
    * @param nodeDest <string> The name for the node (destination)
    * @param color OPTIONAL <string> Color in hex(#ff44ff)
    */
-  public addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): void {
+  public async addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): Promise<void> {
     let additionalConfig = '';
     if (color) additionalConfig += 'color = "${color}"';
     if (label) additionalConfig = additionalConfig ? `${additionalConfig}, label = "${label}` : `label = "${label}`;
@@ -97,7 +97,7 @@ export class Neato {
   /**
    * Save the current output to a dot file in the temp path.
    */
-  private save(): void {
+  private async save(): Promise<void> {
     // Name of the output dot file
     this._dotfilename = `${this.output}.dot`;
 
@@ -164,7 +164,7 @@ export class Neato {
   /**
    * Execute dot program.
    */
-  public compile(): string | void {
+  public async compile(): Promise<string> {
     // Save the program before
     this.save();
 
