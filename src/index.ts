@@ -4,8 +4,8 @@
  * It only archieve the directed graph type
  */
 
-import { ChildProcess, exec as RUN } from 'child_process';
-import { existsSync, createWriteStream, unlinkSync, unlink } from 'fs';
+import { execSync as RUN } from 'child_process';
+import { existsSync, createWriteStream, unlinkSync } from 'fs';
 
 export class Neato {
   private comment: string;
@@ -178,7 +178,7 @@ export class Neato {
     }
 
     const command: string = `dot -K${this.renderer} -T${this.type} ${this._dotfilename} -o ${this.output}.${this.type}`;
-    const execOut: ChildProcess = RUN(command);
+    const execOut: Buffer = RUN(command);
     // Remove dot file
     // unlinkSync(this._dotfilename);
 
