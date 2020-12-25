@@ -5,7 +5,7 @@
  */
 
 import { ChildProcess, exec as RUN } from 'child_process';
-import { existsSync, createWriteStream, unlinkSync } from 'fs';
+import { existsSync, createWriteStream, unlinkSync, unlink } from 'fs';
 
 export class Neato {
   private comment: string;
@@ -21,7 +21,7 @@ export class Neato {
    * @param graphAttributes Internal configs (Same as the api in python pkg)
    * @param nodeAttributes Internal configs
    */
-  public constructor(
+  constructor(
     private output: string,
     private type: string = 'svg',
     private renderer: string = 'neato',
@@ -67,7 +67,7 @@ export class Neato {
    * @param fontColor OPTIONAL <string> Color in hex(#33FF33)
    * @param bgColor OPTIONAL <string> Color in hex(#ff44ff)
    */
-  public async addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): Promise<void> {
+  addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): void {
     if (!node || !label || !pos)
       throw new Error(`You didn't defin'ed the essential variables to this library. Check out the example in git.`);
 
@@ -85,7 +85,7 @@ export class Neato {
    * @param nodeDest <string> The name for the node (destination)
    * @param color OPTIONAL <string> Color in hex(#ff44ff)
    */
-  public async addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): Promise<void> {
+  addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): void {
     let additionalConfig = '';
     if (color) additionalConfig += 'color = "${color}"';
     if (label) additionalConfig = additionalConfig ? `${additionalConfig}, label = "${label}` : `label = "${label}`;
@@ -97,84 +97,91 @@ export class Neato {
   /**
    * Save the current output to a dot file in the temp path.
    */
-  private async save(): Promise<void> {
-    // Name of the output dot file
-    this._dotfilename = `${this.output}.dot`;
+  async save(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Name of the output dot file
+      this._dotfilename = `${this.output}.dot`;
 
-    // Check if exist some file with this filename, if so, remove it
-    if (existsSync(this._dotfilename)) unlinkSync(this._dotfilename);
+      // Check if exist some file with this filename, if so, remove it
+      if (existsSync(this._dotfilename)) unlinkSync(this._dotfilename);
 
-    // Store these infos in the file
-    // try {
-    const stream = createWriteStream(this._dotfilename, { flags: 'a', encoding: 'utf8' });
+      // Store these infos in the file
+      // try {
+      const stream = createWriteStream(this._dotfilename, {
+        flags: 'a',
+        encoding: 'utf8',
+      });
 
-    // An auxiliar function
-    const wrln = (str: string) => stream.write(str + '\n');
+      // An auxiliar function
+      const wrln = (str: string) => stream.write(str + '\n');
 
-    // Write header
-    wrln('/* Simple script to generate a graph plot');
-    wrln(' *');
-    wrln(' * to compile:');
-    wrln(` * >> dot -K${this.renderer} -T${this.type} example.dot -o example.svg`);
-    wrln(' */\n');
-    wrln(`/* ${this.comment} */\n`);
+      // Write header
+      wrln('/* Simple script to generate a graph plot');
+      wrln(' *');
+      wrln(' * to compile:');
+      wrln(` * >> dot -K${this.renderer} -T${this.type} example.dot -o example.svg`);
+      wrln(' */\n');
+      wrln(`/* ${this.comment} */\n`);
 
-    // Write graph attr
-    wrln('digraph G {');
-    wrln(`\t/* Graph attributes */`);
-    wrln(`\trankdir=${this.graphAttributes.rankdir};`);
-    wrln(`\toverlap=${this.graphAttributes.overlap};`);
-    wrln(`\tsplines=${this.graphAttributes.splines};`);
-    wrln(`\tsep=${this.graphAttributes.sep};`);
-    wrln(`\tpad=${this.graphAttributes.pad};`);
-    wrln(`\tnodesep=${this.graphAttributes.nodesep};`);
-    wrln(`\tranksep=${this.graphAttributes.ranksep};`);
+      // Write graph attr
+      wrln('digraph G {');
+      wrln(`\t/* Graph attributes */`);
+      wrln(`\trankdir=${this.graphAttributes.rankdir};`);
+      wrln(`\toverlap=${this.graphAttributes.overlap};`);
+      wrln(`\tsplines=${this.graphAttributes.splines};`);
+      wrln(`\tsep=${this.graphAttributes.sep};`);
+      wrln(`\tpad=${this.graphAttributes.pad};`);
+      wrln(`\tnodesep=${this.graphAttributes.nodesep};`);
+      wrln(`\tranksep=${this.graphAttributes.ranksep};`);
 
-    // Write node general attr attr
-    wrln('');
-    wrln(`\t/* NODE general attr */`);
-    wrln(
-      `\tnode [shape=${this.nodeAttributes.shape}, style=${this.nodeAttributes.style}, height=${this.nodeAttributes.height}, width=${this.nodeAttributes.width}, fontsize=${this.nodeAttributes.fontsize}, fontname=${this.nodeAttributes.fontname}, fontcolor=${this.nodeAttributes.fontcolor}, color=${this.nodeAttributes.color} ];\n`,
-    );
+      // Write node general attr attr
+      wrln('');
+      wrln(`\t/* NODE general attr */`);
+      wrln(
+        `\tnode [shape=${this.nodeAttributes.shape}, style=${this.nodeAttributes.style}, height=${this.nodeAttributes.height}, width=${this.nodeAttributes.width}, fontsize=${this.nodeAttributes.fontsize}, fontname=${this.nodeAttributes.fontname}, fontcolor=${this.nodeAttributes.fontcolor}, color=${this.nodeAttributes.color} ];\n`,
+      );
 
-    // Write node particular attr (colors and positions)
-    wrln(`\t/* NODE particular attr */`);
-    this._nodes.forEach((val) => {
-      wrln(`\t${val}`);
+      // Write node particular attr (colors and positions)
+      wrln(`\t/* NODE particular attr */`);
+      this._nodes.forEach((val) => {
+        wrln(`\t${val}`);
+      });
+
+      // Write edge configs
+      wrln(`\n\t/* Edges (Connections) */`);
+      wrln(
+        `\tedge [ color="${this.graphAttributes.edgecolor}", arrowhead=${this.graphAttributes.arrowhead}, arrowtail=${this.graphAttributes.arrowtail}];`,
+      );
+      this._edges.forEach((val) => wrln(`\t${val}`));
+
+      // Finish
+      wrln('}');
+
+      // stream.end();
+      stream.end();
+
+      stream.on('close', resolve);
     });
-
-    // Write edge configs
-    wrln(`\n\t/* Edges (Connections) */`);
-    wrln(
-      `\tedge [ color="${this.graphAttributes.edgecolor}", arrowhead=${this.graphAttributes.arrowhead}, arrowtail=${this.graphAttributes.arrowtail}];`,
-    );
-    this._edges.forEach((val) => wrln(`\t${val}`));
-
-    // Finish
-    wrln('}');
-
-    // stream.end();
-    stream.end();
-    // } catch (err) {
-    // tslint:disable-next-line: no-console
-    // console.log(`Some error occurred. Check: ${err}`);
-    // }
   }
 
   /**
    * Execute dot program.
    */
-  public async compile(): Promise<string> {
+  async compile(): Promise<string> {
     // Save the program before
-    this.save();
+    await this.save();
 
     // Check if exist some file with this filename, if so, remove it
-    if (existsSync(`${this.output}.${this.type}`)) unlinkSync(`${this.output}.${this.type}`);
+    const filename = `${this.output}.${this.type}`;
+    if (existsSync(filename)) {
+      unlinkSync(filename);
+    }
 
     const command: string = `dot -K${this.renderer} -T${this.type} ${this._dotfilename} -o ${this.output}.${this.type}`;
     const execOut: ChildProcess = RUN(command);
-    // tslint:disable-next-line: no-console
-    // console.debug('Neato -> command', command);
+    // Remove dot file
+    // unlinkSync(this._dotfilename);
+
     return this._dotfilename;
   }
 }

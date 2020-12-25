@@ -45,18 +45,18 @@ export declare class Neato {
      * @param fontColor OPTIONAL <string> Color in hex(#33FF33)
      * @param bgColor OPTIONAL <string> Color in hex(#ff44ff)
      */
-    addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): Promise<void>;
+    addNode(node: string, label: string, pos: string, bgColor?: string, fontColor?: string): void;
     /**
      * Create the connections (edges)
      * @param nodeOrigin <string> The name for the node (origin)
      * @param nodeDest <string> The name for the node (destination)
      * @param color OPTIONAL <string> Color in hex(#ff44ff)
      */
-    addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): Promise<void>;
+    addEdge(nodeOrigin: string, nodeDest: string, color?: string, label?: string): void;
     /**
      * Save the current output to a dot file in the temp path.
      */
-    private save;
+    save(): Promise<void>;
     /**
      * Execute dot program.
      */
