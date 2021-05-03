@@ -1,6 +1,6 @@
 {
   "name": "graphviz-neato",
-  "version": "0.5.8",
+  "version": "0.6.0",
   "description": "A package that will make an interface to the graphviz (neato) language",
   "main": "lib/index.js",
   "scripts": {
