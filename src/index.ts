@@ -76,7 +76,7 @@ export class Neato {
     if (bgColor) additionalConfig += `, fontcolor = "${fontColor}"`;
     additionalConfig += ` ]`;
 
-    this._nodes[this._nodes.length] = `"${node}" [ label = "${label}", ${additionalConfig};`; // pos = "${pos}!"${additionalConfig};`;
+    this._nodes[this._nodes.length] = `"${node}" [ label = "${label}"${additionalConfig};`; // pos = "${pos}!"${additionalConfig};`;
   }
 
   /**
