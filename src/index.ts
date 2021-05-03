@@ -24,10 +24,10 @@ export class Neato {
   constructor(
     private output: string,
     private type: string = 'svg',
-    private renderer: string = 'neato',
+    private renderer: string = 'dot',
     private graphAttributes = {
       // LR/RL (left to right) or BT/TB (bottom up).
-      rankdir: 'BT',
+      rankdir: 'TB',
       overlap: 'scale', // Force position
       // splines → polyline, ortho, true/spline, curved
       splines: 'ortho', // edge uppon vertix
@@ -76,7 +76,7 @@ export class Neato {
     if (bgColor) additionalConfig += `, fontcolor = "${fontColor}"`;
     additionalConfig += ` ]`;
 
-    this._nodes[this._nodes.length] = `"${node}" [ label = "${label}", pos = "${pos}!"${additionalConfig};`;
+    this._nodes[this._nodes.length] = `"${node}" [ label = "${label}", ${additionalConfig};`; // pos = "${pos}!"${additionalConfig};`;
   }
 
   /**
